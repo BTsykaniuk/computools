@@ -215,4 +215,11 @@ ENV/
 db.sqlite3
 
 .idea/
+
+# exclude everything
+static/*
+
+# exception to the rule
+!static/.gitkeep
+
 >>>>>>> 074d937dfc6fc6faf6736067f993c384682fe227
