@@ -18,4 +18,5 @@ from .views import *
 
 urlpatterns = [
     path('', ProductList.as_view(), name='index'),
+    path('product/<int:pk>', ProductDetails.as_view(), name='product-details'),
 ]

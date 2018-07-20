@@ -218,10 +218,12 @@ db.sqlite3
 
 # exclude everything
 static/*
+# exclude everything
 media/*
 
 # exception to the rule
 !static/.gitkeep
+# exception to the rule
 !media/.gitkeep
 
 >>>>>>> 074d937dfc6fc6faf6736067f993c384682fe227

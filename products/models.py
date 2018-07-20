@@ -17,7 +17,7 @@ class Product(BaseModel):
     image = models.ImageField(upload_to='products_images/')
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
 
 class Item(BaseModel):
