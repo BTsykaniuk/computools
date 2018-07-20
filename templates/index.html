@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Hello world^)</h1>
+
+    {% for item in product_list %}
+        <li>{{ item.name }}</li>
+    {% endfor %}
+{% endblock %}
