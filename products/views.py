@@ -12,4 +12,4 @@ class ProductList(generic.ListView):
     context_object_name = 'product_list'
 
     def get_queryset(self):
-        return Product.objects.all()
+        return Product.objects.all().filter(active=True)
