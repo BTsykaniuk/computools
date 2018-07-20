@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.utils.text import slugify
 
 
 class BaseModel(models.Model):
@@ -15,9 +16,14 @@ class Product(BaseModel):
     description = models.TextField(max_length=800)
     active = models.BooleanField(default=False)
     image = models.ImageField(upload_to='products_images/')
+    slug = models.SlugField(max_length=50, unique=True, db_index=True, editable=False)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super(Product, self).save(*args, **kwargs)
 
 
 class Item(BaseModel):
@@ -26,7 +32,7 @@ class Item(BaseModel):
     active = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     metadata = JSONField(default=None)
-    slug = models.SlugField(max_length=50, unique=True, db_index=True, editable=False)
 
     def __str__(self):
         return f'{self.name} item'
+

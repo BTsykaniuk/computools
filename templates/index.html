@@ -10,7 +10,7 @@
                 <img class="card-img-top" src="{{ product.image.url }}" alt="Card image cap">
                 <div class="card-body">
                     <h4 class="card-title">{{ product.name }}</h4>
-                    <a href="{% url "product-details" pk=product.pk %}" class="btn btn-primary card-btn">More...</a>
+                    <a href="{% url "product-details" slug=product.slug %}" class="btn btn-primary card-btn">More...</a>
                 </div>
             </div>
         {% endfor %}
