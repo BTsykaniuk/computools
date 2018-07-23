@@ -129,3 +129,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = "/media/"
 
 CART_PRODUCT_MODEL = 'products.models.Item'
+CART_TEMPLATE_TAG_NAME = 'get_cart'
