@@ -1,34 +1,47 @@
-from django.views import generic
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.shortcuts import redirect
 
 from carton.cart import Cart
 from products.models import Item
 
 
-class AddToCartView(generic.View):
-    """View for adding Item to Cart"""
-
-    def get(self, request, pk):
-        cart = Cart(request.session)
-        product = Item.objects.get(id=pk)
-        cart.add(product, price=product.price)
-        return redirect('show')
+def add_item(request, pk):
+    cart = Cart(session=request.session, session_key='CART')
+    product = Item.objects.get(id=pk)
+    cart.add(product, price=product.price)
+    request.session['cart_count'] = cart.count
+    return redirect('show')
 
 
-class ShowCartView(generic.View):
-    """View for showing Items in Cart"""
-
-    def get(self, request):
-        return render(request, 'shopping/cart.html')
+def show_cart(request):
+    cart = Cart(session=request.session, session_key='CART')
+    return render(request, 'shopping/cart.html', {'cart': cart})
 
 
-class RemoveSingleItemView(generic.View):
-    """View for remove single item in Cart"""
+def remove_single_item(request, pk):
+    cart = Cart(session=request.session, session_key='CART')
+    product = Item.objects.get(id=pk)
+    cart.remove_single(product)
+    request.session['cart_count'] = cart.count
+    return redirect('show')
 
-    def get (self, request, pk):
-        cart = Cart(request.session)
-        product = Item.objects.get(id=pk)
-        cart.remove_single(product)
-        return redirect('show')
+
+def add_to_wish(request, pk):
+    wishlist = Cart(session=request.session, session_key='WISH')
+    product = Item.objects.get(id=pk)
+    wishlist.add(product, price=product.price)
+    request.session['wish_count'] = wishlist.count
+    return redirect('show_wish')
+
+
+def show_wishlist(request):
+    wishlist = Cart(session=request.session, session_key='WISH')
+    return render(request, 'shopping/wishlist.html', {'wishlist': wishlist})
+
+
+def remove_single_wish(request, pk):
+    wishlist = Cart(session=request.session, session_key='WISH')
+    product = Item.objects.get(id=pk)
+    wishlist.remove_single(product)
+    request.session['wish_count'] = wishlist.count
+    return redirect('show_wish')

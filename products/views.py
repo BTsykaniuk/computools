@@ -11,7 +11,7 @@ class ProductListView(generic.ListView):
         return Product.objects.filter(active=True).all()
 
 
-class ProductDetailsView(generic.DeleteView):
+class ProductDetailsView(generic.DetailView):
     """View for product details"""
     model = Product
     template_name = 'products/product.html'
@@ -19,7 +19,6 @@ class ProductDetailsView(generic.DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailsView, self).get_context_data(**kwargs)
-        # print(kwargs)
         context['items'] = Item.objects.filter(product=kwargs['object']).all()
         return context
 
