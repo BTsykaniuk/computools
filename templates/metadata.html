@@ -1,5 +1,12 @@
 {% block content %}
-    {% for i in key %}
-        {{ i }}
-    {% endfor %}
+    <table class="table">
+        <tbody>
+        {% for key, value in json_items.items %}
+            <tr>
+                <td class="text-muted">{{ key.title }}</td>
+                <td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

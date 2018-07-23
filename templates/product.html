@@ -15,23 +15,29 @@
         </div>
     </div>
 
+    <br>
+
     <div class="row">
         <div class="card-columns">
             {% for item in items %}
                 <div class="card" style="width: 18rem;">
-                    <div class="card-header">{{ item.name }}</div>
+                    <div class="card-header"><h4>{{ item.name }}</h4></div>
 
                     <div class="card-body">
                         <h5 class="text-center text-primary">${{ item.price }}</h5>
 
                         <p>
-                            {%  include 'metadata.html' with key=item.metadata %}
+                            {%  include 'metadata.html' with json_items=item.metadata %}
                         </p>
                     </div>
 
                     <div class="card-footer">
-                        <a href="{% url "product-details" slug=product.slug %}" class="btn btn-primary card-btn">
-                            More...
+                        <a href="{% url "product-details" slug=product.slug %}" class="btn btn-danger" id="item">
+                            Add to Cart
+                        </a>
+
+                        <a href="{% url "product-details" slug=product.slug %}" class="btn btn-primary" id="item">
+                            Add to Wishlist
                         </a>
                     </div>
 
