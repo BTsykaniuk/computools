@@ -27,12 +27,12 @@
                         <h5 class="text-center text-primary">${{ item.price }}</h5>
 
                         <p>
-                            {%  include 'metadata.html' with json_items=item.metadata %}
+                            {% include 'products/metadata.html' with json_items=item.metadata %}
                         </p>
                     </div>
 
                     <div class="card-footer">
-                        <a href="{% url "product-details" slug=product.slug %}" class="btn btn-danger" id="item">
+                        <a href="{% url "add" pk=item.pk %}" class="btn btn-danger" id="item">
                             Add to Cart
                         </a>
 

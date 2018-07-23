@@ -14,7 +14,7 @@ class ProductListView(generic.ListView):
 class ProductDetailsView(generic.DeleteView):
     """View for product details"""
     model = Product
-    template_name = 'product.html'
+    template_name = 'products/product.html'
     context_object_name = 'product'
 
     def get_context_data(self, **kwargs):
