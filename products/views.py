@@ -1,4 +1,5 @@
 from django.views import generic
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from .models import Product, Item
 
 
@@ -21,3 +22,23 @@ class ProductDetailsView(generic.DetailView):
         context = super(ProductDetailsView, self).get_context_data(**kwargs)
         context['items'] = Item.objects.filter(product=kwargs['object']).all()
         return context
+
+
+class ProductSearchView(generic.ListView):
+    """View for Product search form"""
+    model = Product
+    template_name = 'index.html'
+
+    def get_queryset(self):
+        query = Product.objects.filter(active=True).all()
+
+        keys = self.request.GET.get('keys')
+
+        if keys:
+            search_q = SearchQuery(keys)
+            vector = SearchVector('name')
+            query = query.annotate(search=vector).filter(search=search_q)
+            query = query.annotate(rank=SearchRank(vector, search_q)).order_by('-rank')
+
+        return query
+
