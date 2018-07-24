@@ -28,6 +28,7 @@ class ProductSearchView(generic.ListView):
     """View for Product search form"""
     model = Product
     template_name = 'index.html'
+    context_object_name = 'product_list'
 
     def get_queryset(self):
         query = Product.objects.filter(active=True).all()

@@ -5,15 +5,20 @@
     <h2>All products</h2>
 
     <div class="card-columns">
-        {% for product in product_list %}
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="{{ product.image.url }}" alt="Card image cap">
-                <div class="card-body">
-                    <h4 class="card-title">{{ product.name }}</h4>
-                    <a href="{% url "product-details" slug=product.slug %}" class="btn btn-primary card-btn">More...</a>
+        {% if product_list %}
+            {% for product in product_list %}
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="{{ product.image.url }}" alt="Card image cap">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ product.name }}</h4>
+                        <a href="{% url "product-details" slug=product.slug %}"
+                           class="btn btn-primary card-btn">More...</a>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p>No products to display</p>
+        {% endif %}
     </div>
 
 {% endblock %}
