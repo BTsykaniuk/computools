@@ -21,4 +21,3 @@ class ProductDetailsView(generic.DetailView):
         context = super(ProductDetailsView, self).get_context_data(**kwargs)
         context['items'] = Item.objects.filter(product=kwargs['object']).all()
         return context
-
