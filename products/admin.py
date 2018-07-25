@@ -1,12 +1,12 @@
 from django.contrib import admin
-from .models import *
+from .models import Item, Product
 
 # Register your models here.
 
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'create_date', 'update_date', 'active']
+    list_display = ['name', 'price', 'quantity', 'create_date', 'update_date', 'active']
 
 
 @admin.register(Product)
