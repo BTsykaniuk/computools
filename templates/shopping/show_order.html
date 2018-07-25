@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load static %}
+
+{% block content %}
+
+        <h4>New order</h4>
+        <table class="table">
+            <thead>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            </thead>
+            {% for item in items %}
+                <tr>
+                    <td>{{ item.item.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total_price }}</td>
+                </tr>
+            {% endfor %}
+            <tr class="font-weight-bold">
+                <td>Total</td>
+                <td>{{ order.total_items_count }}</td>
+                <td colspan="2">{{ order.total_price }}</td>
+            </tr>
+        </table>
+        <div class="text-center">
+{#            <a href="{% url 'payment_order' %}">#}
+                <button type="button" class="btn btn-success ">Buy</button>
+            </a>
+            <a href="{% url 'cancel_order' pk=order.pk %}">
+                <button type="button" class="btn btn-danger">Cancel</button>
+            </a>
+        </div>
+
+{% endblock content %}

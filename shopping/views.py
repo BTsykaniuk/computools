@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import redirect, HttpResponse
 from django.views import generic
+from django.urls import reverse_lazy
 
 from carton.cart import Cart
+from .models import Order, OrderItem
 from products.models import Item
 
 
@@ -58,3 +60,65 @@ class RemoveWishItemView(generic.View):
         wishlist.remove_single(product)
         request.session['wish_count'] = wishlist.count
         return redirect('show_wish')
+
+
+class AddOrderView(generic.View):
+    """Add order data to models Order & OrderItem"""
+    model = Order
+
+    def get(self, request):
+        cart = Cart(session=request.session, session_key='CART')
+
+        if self.valid(cart.items):
+            """Add data to Order"""
+            order_obj = self.model(total_price=cart.total,
+                                   total_items_count=cart.count,
+                                   status='WAITING',
+                                   metadata={'None': 'None'})
+
+            order_obj.save()
+
+            """Add data to OrderItem"""
+            for item in cart.items:
+                item_obj = OrderItem(order=order_obj,
+                                     item=Item.objects.get(name=item.product.name),
+                                     quantity=item.quantity,
+                                     total_price=item.subtotal)
+
+                item_obj.save()
+
+            # del request.session['CART']
+            # request.session['cart_count'] = 0
+
+            return redirect('show_order', pk=order_obj.pk)
+
+        else:
+            return HttpResponse('Error!')
+
+    @staticmethod
+    def valid(items):
+        """Validate cart items data"""
+
+        valid = True
+        for item in items:
+            quantity = Item.objects.filter(name=item.product.name).values_list('quantity', flat=True)
+            if item.quantity > quantity[0]:
+                valid = False
+
+        return valid
+
+
+class ShowOrderView(generic.DetailView):
+    """Show Order details"""
+    model = Order
+    template_name = 'shopping/show_order.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ShowOrderView, self).get_context_data(**kwargs)
+        context['items'] = OrderItem.objects.filter(order=kwargs['object']).all()
+        return context
+
+
+class CancelOrderView(generic.DeleteView):
+    model = Order
+    success_url = reverse_lazy('index')
