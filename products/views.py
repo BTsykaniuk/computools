@@ -20,7 +20,7 @@ class ProductDetailsView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailsView, self).get_context_data(**kwargs)
-        context['items'] = Item.objects.filter(product=kwargs['object']).all()
+        context['items'] = Item.objects.filter(product=kwargs['object'], active=True).all()
         return context
 
 

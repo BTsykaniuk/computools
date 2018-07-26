@@ -15,6 +15,7 @@ class Order(BaseModel):
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     total_items_count = models.DecimalField(max_digits=6, decimal_places=0)
     status = models.CharField(max_length=7, choices=PAYMENT_STATUS)
+    charge_id = models.CharField(max_length=30, blank=True)
     items = models.ManyToManyField(Item, through='OrderItem')
     metadata = JSONField(default=None)
 

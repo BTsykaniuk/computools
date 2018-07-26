@@ -99,16 +99,24 @@ class AddOrderView(generic.View):
                                      total_price=item.subtotal)
 
                 item_obj.save()
-                # print('###########################################', request.session.items())
-                # del request.session['CART']
-                # request.session['cart_count'] = 0
-                # request.session.modified = True
 
-            context = {'order': order_obj,
-                       'stripe_key': settings.STRIPE_PUBLIC_KEY,
-                       'stripe_amount': order_obj.total_price*100}
+                # Update Item quantity
+                item_quantity = Item.objects.filter(name=item_obj.item.name).values_list('quantity', flat=True)[0]
 
-            return render(request, 'shopping/payment.html', context)
+                new_quantity = item_quantity-item_obj.quantity
+                print(new_quantity)
+
+                if new_quantity > 0:
+                    Item.objects.filter(name=item_obj.item.name).update(quantity=new_quantity)
+                else:
+                    Item.objects.filter(name=item_obj.item.name).update(quantity=0, active=False)
+
+            request.session['CART'] = {}
+            request.session.modified = True
+            request.session['cart_count'] = 0
+            request.session['order'] = True
+
+            return redirect('payment', pk=order_obj.pk)
 
         else:
             return HttpResponse('Error!')
@@ -119,8 +127,8 @@ class AddOrderView(generic.View):
 
         valid = True
         for item in items:
-            quantity = Item.objects.filter(name=item.product.name).values_list('quantity', flat=True)
-            if item.quantity > quantity[0]:
+            quantity = Item.objects.filter(name=item.product.name).values_list('quantity', flat=True)[0]
+            if item.quantity >= quantity:
                 valid = False
 
         return valid
@@ -131,29 +139,51 @@ class PaymentView(generic.DetailView):
     model = Order
     template_name = "shopping/payment.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(PaymentView, self).get_context_data(**kwargs)
+        context['stripe_key'] = settings.STRIPE_PUBLIC_KEY
+        amount = Order.objects.filter(pk=self.kwargs['pk']).values_list('total_price', flat=True)[0]
+        context['stripe_amount'] = int(amount*100)
+
+        return context
+
 
 class CancelOrderView(generic.DeleteView):
     """Cancel Order -> Delete order data from DB"""
     model = Order
     success_url = reverse_lazy('index')
 
+    def delete(self, request, *args, **kwargs):
+
+        request.session['order'] = False
+        return super(CancelOrderView, self).delete(self, request, *args, **kwargs)
+
 
 class CreatingChargeView(generic.View):
-    """"""
+    """View for create Charge"""
+
     def post(self, request):
+        print(self.request.session['order'])
         token = request.POST.get('stripeToken')
 
         order_pk = request.POST['order_pk']
 
         amount = Order.objects.filter(pk=order_pk).values_list('total_price', flat=True)[0]
 
-        charge = stripe.Charge.create(
-            amount=int(amount*100),
-            currency='usd',
-            description=f'Charge for Order #{order_pk}',
-            source=token,
-        )
+        try:
+            charge = stripe.Charge.create(
+                amount=int(amount * 100),
+                currency='usd',
+                description=f'Charge for Order #{order_pk}',
+                source=token,
+            )
 
-        Order.objects.filter(pk=order_pk).update(status='SUCCESS')
+            # update Order payment status
+            Order.objects.filter(pk=order_pk).update(status='SUCCESS', charge_id=charge.id)
 
-        return HttpResponse('Payment success!')
+            return HttpResponse('Payment success!')
+
+        except stripe.error.CardError as ce:
+            Order.objects.filter(pk=order_pk).update(status='ERROR')
+
+            return HttpResponse('Payment error!')

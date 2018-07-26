@@ -18,9 +18,9 @@
     </table>
     <div class="text-center">
         {% include 'shopping/stripe_payment_form.html' with amount=stripe_amount token=stripe_key order_pk=order.pk %}
-        {#        <a href="{% url 'show' %}">#}
-        {#            <button type="button" class="btn btn-danger">Cancel</button>#}
-        {#        </a>#}
+        <a href="{% url 'cancel_order' pk=order.pk %}">
+            <button type="button" class="btn btn-danger">Cancel</button>
+        </a>
     </div>
 
 {% endblock content %}
