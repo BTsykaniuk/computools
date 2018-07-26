@@ -8,7 +8,7 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['total_price', 'total_items_count', 'status', 'create_date', 'metadata']
+    list_display = ['id', 'total_price', 'total_items_count', 'status', 'create_date', 'metadata']
     inlines = [OrderItemInline]
 
     def total_price(self, obj):

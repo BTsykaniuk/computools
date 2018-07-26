@@ -1,3 +1,4 @@
+from test_store import settings
 from django.shortcuts import render
 from django.shortcuts import redirect, HttpResponse
 from django.views import generic
@@ -7,6 +8,10 @@ from carton.cart import Cart
 from .models import Order, OrderItem
 from products.models import Item
 
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 class AddCartItemView(generic.View):
 
@@ -15,7 +20,7 @@ class AddCartItemView(generic.View):
         product = Item.objects.get(id=pk)
         cart.add(product, price=product.price)
         request.session['cart_count'] = cart.count
-        return redirect('show')
+        return redirect('show_cart')
 
 
 class ShowCartView(generic.View):
@@ -32,7 +37,7 @@ class RemoveCartItemView(generic.View):
         product = Item.objects.get(id=pk)
         cart.remove_single(product)
         request.session['cart_count'] = cart.count
-        return redirect('show')
+        return redirect('show_cart')
 
 
 class AddWishItemView(generic.View):
@@ -94,8 +99,16 @@ class AddOrderView(generic.View):
                                      total_price=item.subtotal)
 
                 item_obj.save()
+                # print('###########################################', request.session.items())
+                # del request.session['CART']
+                # request.session['cart_count'] = 0
+                # request.session.modified = True
 
-            return HttpResponse(f'Your order #{order_obj.pk} was successefuly created')
+            context = {'order': order_obj,
+                       'stripe_key': settings.STRIPE_PUBLIC_KEY,
+                       'stripe_amount': order_obj.total_price*100}
+
+            return render(request, 'shopping/payment.html', context)
 
         else:
             return HttpResponse('Error!')
@@ -113,6 +126,34 @@ class AddOrderView(generic.View):
         return valid
 
 
+class PaymentView(generic.DetailView):
+    """View for Payment page"""
+    model = Order
+    template_name = "shopping/payment.html"
+
+
 class CancelOrderView(generic.DeleteView):
+    """Cancel Order -> Delete order data from DB"""
     model = Order
     success_url = reverse_lazy('index')
+
+
+class CreatingChargeView(generic.View):
+    """"""
+    def post(self, request):
+        token = request.POST.get('stripeToken')
+
+        order_pk = request.POST['order_pk']
+
+        amount = Order.objects.filter(pk=order_pk).values_list('total_price', flat=True)[0]
+
+        charge = stripe.Charge.create(
+            amount=int(amount*100),
+            currency='usd',
+            description=f'Charge for Order #{order_pk}',
+            source=token,
+        )
+
+        Order.objects.filter(pk=order_pk).update(status='SUCCESS')
+
+        return HttpResponse('Payment success!')

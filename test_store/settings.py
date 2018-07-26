@@ -130,3 +130,7 @@ MEDIA_URL = "/media/"
 
 CART_PRODUCT_MODEL = 'products.models.Item'
 CART_TEMPLATE_TAG_NAME = 'get_cart'
+
+# STRIPE settings
+STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_SECRET_KEY", "pk_test_ltcy67Vum9tAHcihj8pEQ5Iy")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "sk_test_tkMOHqlEPzALseOrjJIxpsJi")

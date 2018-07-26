@@ -1,0 +1,16 @@
+{% block content %}
+    <form action="{% url 'charge' %}" method="POST">
+        {% csrf_token %}
+        <script
+                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="{{ token }}"
+                data-amount="{{ amount }}"
+                data-name="Stripe.com"
+                data-description="Example charge"
+                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                data-locale="auto"
+                data-zip-code="true">
+        </script>
+        <input type="hidden" name="order_pk" value="{{ order_pk }}">
+    </form>
+{% endblock content %}

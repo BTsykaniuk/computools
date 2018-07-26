@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load static %}
+
+{% block content %}
+
+    <h4>Your order #{{ order.pk }} was successefuly created</h4>
+    <p>Now you can pay it or cancel</p>
+    <table class="table mx-auto">
+        <thead>
+        <th>Order #</th>
+        <th>Total Price</th>
+        </thead>
+        <tr>
+            <td>{{ order.pk }}</td>
+            <td>{{ order.total_price }}</td>
+        </tr>
+    </table>
+    <div class="text-center">
+        {% include 'shopping/stripe_payment_form.html' with amount=stripe_amount token=stripe_key order_pk=order.pk %}
+        {#        <a href="{% url 'show' %}">#}
+        {#            <button type="button" class="btn btn-danger">Cancel</button>#}
+        {#        </a>#}
+    </div>
+
+{% endblock content %}
