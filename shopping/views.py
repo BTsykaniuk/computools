@@ -62,6 +62,14 @@ class RemoveWishItemView(generic.View):
         return redirect('show_wish')
 
 
+class CreateOrderView(generic.View):
+    """Create Order"""
+
+    def get(self, request):
+        cart = Cart(session=request.session, session_key='CART')
+        return render(request, 'shopping/create_order.html', {'order': cart})
+
+
 class AddOrderView(generic.View):
     """Add order data to models Order & OrderItem"""
     model = Order
@@ -87,10 +95,7 @@ class AddOrderView(generic.View):
 
                 item_obj.save()
 
-            # del request.session['CART']
-            # request.session['cart_count'] = 0
-
-            return redirect('show_order', pk=order_obj.pk)
+            return HttpResponse(f'Your order #{order_obj.pk} was successefuly created')
 
         else:
             return HttpResponse('Error!')
@@ -106,17 +111,6 @@ class AddOrderView(generic.View):
                 valid = False
 
         return valid
-
-
-class ShowOrderView(generic.DetailView):
-    """Show Order details"""
-    model = Order
-    template_name = 'shopping/show_order.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ShowOrderView, self).get_context_data(**kwargs)
-        context['items'] = OrderItem.objects.filter(order=kwargs['object']).all()
-        return context
 
 
 class CancelOrderView(generic.DeleteView):

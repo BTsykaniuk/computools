@@ -15,16 +15,16 @@ Including another URLconf
 """
 from django.urls import path
 from .views import AddCartItemView, ShowCartView, RemoveCartItemView, AddWishItemView, ShowWishlistView, \
-                   RemoveWishItemView, AddOrderView, ShowOrderView, CancelOrderView
+                   RemoveWishItemView, AddOrderView, CreateOrderView, CancelOrderView
 
 urlpatterns = [
-    path('add/<int:pk>', AddCartItemView.as_view(), name='add'),
-    path('', ShowCartView.as_view(), name='show'),
-    path('remove/<int:pk>', RemoveCartItemView.as_view(), name='remove_single'),
+    path('add/<int:pk>', AddCartItemView.as_view(), name='add_to_cart'),
+    path('', ShowCartView.as_view(), name='show_cart'),
+    path('remove/<int:pk>', RemoveCartItemView.as_view(), name='remove_single_cart'),
     path('wishlist/add/<int:pk>', AddWishItemView.as_view(), name='add_wish'),
     path('wishlist/', ShowWishlistView.as_view(), name='show_wish'),
     path('wishlist/remove/<int:pk>', RemoveWishItemView.as_view(), name='remove_single_wish'),
-    path('order/', AddOrderView.as_view(), name='add_order'),
-    path('order/<int:pk>', ShowOrderView.as_view(), name='show_order'),
+    path('order/', CreateOrderView.as_view(), name='show_order'),
+    path('order/add', AddOrderView.as_view(), name='add_order'),
     path('order/delete/<int:pk>', CancelOrderView.as_view(), name='cancel_order'),
 ]

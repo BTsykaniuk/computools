@@ -11,7 +11,7 @@
             <th>Quantity</th>
             <th>Total Price</th>
             </thead>
-            {% for item in items %}
+            {% for item in order %}
                 <tr>
                     <td>{{ item.item.name }}</td>
                     <td>{{ item.quantity }}</td>
@@ -25,10 +25,10 @@
             </tr>
         </table>
         <div class="text-center">
-{#            <a href="{% url 'payment_order' %}">#}
+            <a href="{% url 'add_order' %}">
                 <button type="button" class="btn btn-success ">Buy</button>
             </a>
-            <a href="{% url 'cancel_order' pk=order.pk %}">
+            <a href="{% url 'show' %}">
                 <button type="button" class="btn btn-danger">Cancel</button>
             </a>
         </div>

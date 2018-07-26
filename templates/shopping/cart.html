@@ -18,11 +18,11 @@
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.subtotal }}</td>
                     <td>
-                        <a href="{% url 'add' pk=item.product.pk %}">
+                        <a href="{% url 'add_to_cart' pk=item.product.pk %}">
                             <i class="fas fa-plus"></i>
                         </a>
                         /
-                        <a href="{% url 'remove_single' pk=item.product.pk %}">
+                        <a href="{% url 'remove_single_cart' pk=item.product.pk %}">
                             <i class="fas fa-minus"></i>
                         </a>
                     </td>
