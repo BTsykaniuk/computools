@@ -114,7 +114,6 @@ class AddOrderView(generic.View):
             request.session['CART'] = {}
             request.session.modified = True
             request.session['cart_count'] = 0
-            request.session['order'] = True
 
             return redirect('payment', pk=order_obj.pk)
 
@@ -128,7 +127,7 @@ class AddOrderView(generic.View):
         valid = True
         for item in items:
             quantity = Item.objects.filter(name=item.product.name).values_list('quantity', flat=True)[0]
-            if item.quantity >= quantity:
+            if item.quantity > quantity:
                 valid = False
 
         return valid
@@ -155,7 +154,17 @@ class CancelOrderView(generic.DeleteView):
 
     def delete(self, request, *args, **kwargs):
 
-        request.session['order'] = False
+        order_items = Order.objects.filter(pk=kwargs['pk']).values_list('items', flat=True)
+        print(order_items)
+
+        for order_item in order_items:
+            # Item quentity from Items
+            item_quantity = Item.objects.filter(pk=order_item).values_list('quantity', flat=True)[0]
+            # Order items quantity from OrderItem
+            order_item_qunatity = OrderItem.objects.filter(item=order_item).values_list('quantity', flat=True)[0]
+
+            Item.objects.filter(pk=order_item).update(quantity=item_quantity+order_item_qunatity, active=True)
+
         return super(CancelOrderView, self).delete(self, request, *args, **kwargs)
 
 
