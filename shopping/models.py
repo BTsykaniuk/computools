@@ -10,6 +10,7 @@ class Order(BaseModel):
         ('WAITING', 'Waiting'),
         ('SUCCESS', 'Success'),
         ('ERROR', 'Error'),
+        ('CANCEL', 'Cancel'),
     )
 
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
