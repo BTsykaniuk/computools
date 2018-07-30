@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import path
 from .views import AddCartItemView, ShowCartView, RemoveCartItemItemView, AddWishItemView, ShowWishlistView, \
-                   RemoveWishItemViewItem, AddOrderView, CreateOrderView, CancelOrderView, PaymentView, CreatingChargeView
+                   RemoveWishItemView, AddOrderView, CreateOrderView, CancelOrderView, PaymentView, CreatingChargeView
 
 urlpatterns = [
     path('add/<int:pk>', AddCartItemView.as_view(), name='add_to_cart'),
@@ -23,7 +23,7 @@ urlpatterns = [
     path('remove/<int:pk>', RemoveCartItemItemView.as_view(), name='remove_single_cart'),
     path('wishlist/add/<int:pk>', AddWishItemView.as_view(), name='add_wish'),
     path('wishlist/', ShowWishlistView.as_view(), name='show_wish'),
-    path('wishlist/remove/<int:pk>', RemoveWishItemViewItem.as_view(), name='remove_single_wish'),
+    path('wishlist/remove/<int:pk>', RemoveWishItemView.as_view(), name='remove_single_wish'),
     path('order/', CreateOrderView.as_view(), name='show_order'),
     path('order/add', AddOrderView.as_view(), name='add_order'),
     path('order/delete/<int:pk>', CancelOrderView.as_view(), name='cancel_order'),

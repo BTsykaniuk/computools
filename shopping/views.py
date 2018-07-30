@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect, HttpResponse
 from django.views import generic
 from django.db.models import F
+from django.contrib import messages
 
 from .models import Order, OrderItem
 from products.models import Item
@@ -30,7 +31,8 @@ class ShowCartView(ShowCartMixin, generic.View):
 class RemoveCartItemItemView(RemoveCartItemMixin, generic.View):
     """Remove Cart Item"""
     session_key = 'CART'
-    template = 'show_cart'
+    redirect_view = 'show_cart'
+    count = 'cart_count'
 
 
 class AddWishItemView(AddToCartMixin, generic.View):
@@ -46,7 +48,7 @@ class ShowWishlistView(ShowCartMixin, generic.View):
     template = 'shopping/wishlist.html'
 
 
-class RemoveWishItemViewItem(RemoveCartItemMixin, generic.View):
+class RemoveWishItemView(RemoveCartItemMixin, generic.View):
     """Remove Wishlist Item"""
     session_key = 'WISH'
     redirect_view = 'show_wish'
@@ -105,7 +107,9 @@ class AddOrderView(generic.View):
             return redirect('payment', pk=order_obj.pk)
 
         else:
-            return HttpResponse('Error!')
+            # Add message
+            messages.error(request, 'Error!')
+            return redirect('index')
 
     @staticmethod
     def valid(items):
@@ -157,7 +161,7 @@ class CreatingChargeView(generic.View):
 
         order_pk = request.POST['order_pk']
 
-        amount = Order.objects.get(id=order_pk)
+        amount = Order.objects.get(pk=order_pk)
 
         try:
             charge = stripe.Charge.create(
@@ -170,9 +174,13 @@ class CreatingChargeView(generic.View):
             # update Order payment status
             Order.objects.filter(pk=order_pk).update(status='SUCCESS', charge_id=charge.id)
 
-            return HttpResponse('Payment success!')
+            messages.success(request, 'Payment was successful! Thanks for the purchase!')
+
+            return redirect('index')
 
         except stripe.error.CardError as ce:
             Order.objects.filter(pk=order_pk).update(status='ERROR')
 
-            return HttpResponse('Payment error!')
+            messages.error(request, 'Error! The payment has not passed!')
+
+            return redirect('index')
