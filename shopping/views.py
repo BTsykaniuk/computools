@@ -1,6 +1,6 @@
 from test_store import settings
 from django.shortcuts import render
-from django.shortcuts import redirect, HttpResponse
+from django.shortcuts import redirect
 from django.views import generic
 from django.db.models import F
 from django.contrib import messages
