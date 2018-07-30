@@ -13,7 +13,7 @@ class AddToCartMixin(object):
         cart = Cart(session=request.session, session_key=self.session_key)
         product = self.get_product(item_id)
         cart.add(product, price=product.price)
-        request.session[self.count] = cart.count
+
         return redirect(self.redirect_view)
 
     @staticmethod
@@ -37,7 +37,7 @@ class RemoveCartItemMixin(AddToCartMixin, object):
         cart = Cart(session=request.session, session_key=self.session_key)
         product = self.get_product(item_id)
         cart.remove_single(product)
-        request.session[self.count] = cart.count
+
         return redirect(self.redirect_view)
 
 

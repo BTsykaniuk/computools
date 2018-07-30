@@ -39,13 +39,13 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'show_cart' %}">
                     <i class="fas fa-shopping-cart"></i>
-                    Cart <span class="badge badge-pill badge-light">{{ request.session.cart_count }}</span>
+                    Cart <span class="badge badge-pill badge-light">{{ cart_count }}</span>
                 </a>
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'show_wish' %}">
                     <i class="fas fa-heart"></i>
-                    Wishlist <span class="badge badge-pill badge-light">{{ request.session.wish_count }}</span>
+                    Wishlist <span class="badge badge-pill badge-light">{{ wish_count }}</span>
                 </a>
             </li>
         </ul>

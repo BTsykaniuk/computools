@@ -19,7 +19,6 @@ class AddCartItemView(AddToCartMixin, generic.View):
     """Add Items to Cart"""
     session_key = 'CART'
     redirect_view = 'show_cart'
-    count = 'cart_count'
 
 
 class ShowCartView(ShowCartMixin, generic.View):
@@ -32,14 +31,12 @@ class RemoveCartItemItemView(RemoveCartItemMixin, generic.View):
     """Remove Cart Item"""
     session_key = 'CART'
     redirect_view = 'show_cart'
-    count = 'cart_count'
 
 
 class AddWishItemView(AddToCartMixin, generic.View):
     """Add Items to Wishlist"""
     session_key = 'WISH'
     redirect_view = 'show_wish'
-    count = 'wish_count'
 
 
 class ShowWishlistView(ShowCartMixin, generic.View):
@@ -52,7 +49,6 @@ class RemoveWishItemView(RemoveCartItemMixin, generic.View):
     """Remove Wishlist Item"""
     session_key = 'WISH'
     redirect_view = 'show_wish'
-    count = 'wish_count'
 
 
 class CreateOrderView(generic.View):
