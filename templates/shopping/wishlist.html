@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    {% if wishlist.items %}
+    {% if cart.items %}
         <h4>Wishlist</h4>
         <table class="table">
             <thead>
@@ -12,7 +12,7 @@
             <th>Total Price</th>
             <th>Add/Remove</th>
             </thead>
-            {% for item in wishlist.items %}
+            {% for item in cart.items %}
                 <tr>
                     <td>{{ item.product.name }}</td>
                     <td>{{ item.quantity }}</td>

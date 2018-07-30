@@ -2,76 +2,61 @@ from test_store import settings
 from django.shortcuts import render
 from django.shortcuts import redirect, HttpResponse
 from django.views import generic
-from django.urls import reverse_lazy
 from django.db.models import F
 
-from carton.cart import Cart
 from .models import Order, OrderItem
 from products.models import Item
+from carton.cart import Cart
+from .mixins import AddToCartMixin, ShowCartMixin, RemoveCartItemMixin, CancelOrderMixin
 
 import stripe
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-class AddCartItemView(generic.View):
-
-    def get(self, request, pk):
-        cart = Cart(session=request.session, session_key='CART')
-        product = Item.objects.get(id=pk)
-        cart.add(product, price=product.price)
-        request.session['cart_count'] = cart.count
-        return redirect('show_cart')
+class AddCartItemView(AddToCartMixin, generic.View):
+    """Add Items to Cart"""
+    session_key = 'CART'
+    redirect_view = 'show_cart'
+    count = 'cart_count'
 
 
-class ShowCartView(generic.View):
-
-    def get(self, request):
-        cart = Cart(session=request.session, session_key='CART')
-        return render(request, 'shopping/cart.html', {'cart': cart})
-
-
-class RemoveCartItemView(generic.View):
-
-    def get(self, request, pk):
-        cart = Cart(session=request.session, session_key='CART')
-        product = Item.objects.get(id=pk)
-        cart.remove_single(product)
-        request.session['cart_count'] = cart.count
-        return redirect('show_cart')
+class ShowCartView(ShowCartMixin, generic.View):
+    """Show Cart details"""
+    session_key = 'CART'
+    template = 'shopping/cart.html'
 
 
-class AddWishItemView(generic.View):
-
-    def get(self, request, pk):
-        wishlist = Cart(session=request.session, session_key='WISH')
-        product = Item.objects.get(id=pk)
-        wishlist.add(product, price=product.price)
-        request.session['wish_count'] = wishlist.count
-        return redirect('show_wish')
+class RemoveCartItemItemView(RemoveCartItemMixin, generic.View):
+    """Remove Cart Item"""
+    session_key = 'CART'
+    template = 'show_cart'
 
 
-class ShowWishlistView(generic.View):
+class AddWishItemView(AddToCartMixin, generic.View):
+    """Add Items to Wishlist"""
+    session_key = 'WISH'
+    redirect_view = 'show_wish'
+    count = 'wish_count'
 
-    def get(self, request):
-        wishlist = Cart(session=request.session, session_key='WISH')
-        return render(request, 'shopping/wishlist.html', {'wishlist': wishlist})
+
+class ShowWishlistView(ShowCartMixin, generic.View):
+    """Show Wishlist details"""
+    session_key = 'WISH'
+    template = 'shopping/wishlist.html'
 
 
-class RemoveWishItemView(generic.View):
-
-    def get(self, request, pk):
-        wishlist = Cart(session=request.session, session_key='WISH')
-        product = Item.objects.get(id=pk)
-        wishlist.remove_single(product)
-        request.session['wish_count'] = wishlist.count
-        return redirect('show_wish')
+class RemoveWishItemViewItem(RemoveCartItemMixin, generic.View):
+    """Remove Wishlist Item"""
+    session_key = 'WISH'
+    redirect_view = 'show_wish'
+    count = 'wish_count'
 
 
 class CreateOrderView(generic.View):
     """Create Order"""
-
-    def get(self, request):
+    @staticmethod
+    def get(request):
         cart = Cart(session=request.session, session_key='CART')
         return render(request, 'shopping/create_order.html', {'order': cart})
 
@@ -149,7 +134,7 @@ class PaymentView(generic.DetailView):
         return context
 
 
-class CancelOrderView(generic.View):
+class CancelOrderView(CancelOrderMixin, generic.View):
     """Cancel Order -> Change payment status to Cancel and back Items"""
     model = Order
 
@@ -158,26 +143,25 @@ class CancelOrderView(generic.View):
         self.model.objects.filter(pk=pk).update(status='CANCEL')
 
         # Back Items from Order
-        for order_item in OrderItem.objects.filter(order=pk).select_related('item'):
-            order_item.item.quantity = F('quantity') + order_item.quantity
-            order_item.item.save()
+        self.back_item(pk)
+
         return redirect('index')
 
 
 class CreatingChargeView(generic.View):
     """View for create Charge"""
 
-    def post(self, request):
-        print(self.request.session['order'])
+    @staticmethod
+    def post(request):
         token = request.POST.get('stripeToken')
 
         order_pk = request.POST['order_pk']
 
-        amount = Order.objects.filter(pk=order_pk).values_list('total_price', flat=True)[0]
+        amount = Order.objects.get(id=order_pk)
 
         try:
             charge = stripe.Charge.create(
-                amount=int(amount * 100),
+                amount=int(amount.total_price * 100),
                 currency='usd',
                 description=f'Charge for Order #{order_pk}',
                 source=token,

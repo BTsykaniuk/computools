@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.db.models import F
 from .models import Order, OrderItem
+from .mixins import CancelOrderMixin
 
 
 class OrderItemInline(admin.TabularInline):
@@ -8,7 +8,7 @@ class OrderItemInline(admin.TabularInline):
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(CancelOrderMixin, admin.ModelAdmin):
     list_display = ['id', 'total_price', 'total_items_count', 'status', 'create_date', 'metadata']
     inlines = [OrderItemInline]
 
@@ -18,9 +18,7 @@ class OrderAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         # Back Order Items
         if obj.status == 'CANCEL':
-            for order_item in OrderItem.objects.filter(order=obj.pk).select_related('item'):
-                order_item.item.quantity = F('quantity') + order_item.quantity
-                order_item.item.save()
+            self.back_item(obj.pk)
 
         obj.save()
 
