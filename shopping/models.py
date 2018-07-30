@@ -17,7 +17,7 @@ class Order(BaseModel):
     status = models.CharField(max_length=7, choices=PAYMENT_STATUS)
     charge_id = models.CharField(max_length=30, blank=True)
     items = models.ManyToManyField(Item, through='OrderItem')
-    metadata = JSONField(default=None)
+    metadata = JSONField(null=False, blank=True)
 
     def __str__(self):
         return f"Date - {self.create_date} Amount - {self.total_price}"

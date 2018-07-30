@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect, HttpResponse
 from django.views import generic
 from django.urls import reverse_lazy
+from django.db.models import F
 
 from carton.cart import Cart
 from .models import Order, OrderItem
@@ -87,7 +88,7 @@ class AddOrderView(generic.View):
             order_obj = self.model(total_price=cart.total,
                                    total_items_count=cart.count,
                                    status='WAITING',
-                                   metadata={'None': 'None'})
+                                   metadata={})
 
             order_obj.save()
 
@@ -101,16 +102,17 @@ class AddOrderView(generic.View):
                 item_obj.save()
 
                 # Update Item quantity
-                item_quantity = Item.objects.filter(name=item_obj.item.name).values_list('quantity', flat=True)[0]
+                item_quantity = Item.objects.get(id=item_obj.item.id)
 
-                new_quantity = item_quantity-item_obj.quantity
-                print(new_quantity)
+                new_quantity = item_quantity.quantity - item_obj.quantity
 
                 if new_quantity > 0:
-                    Item.objects.filter(name=item_obj.item.name).update(quantity=new_quantity)
+                    item_quantity.quantity = F('quantity') - item_obj.quantity
+                    item_quantity.save()
                 else:
-                    Item.objects.filter(name=item_obj.item.name).update(quantity=0, active=False)
+                    Item.objects.filter(id=item_obj.item.id).update(quantity=0, active=False)
 
+            # Clear Cart
             request.session['CART'] = {}
             request.session.modified = True
             request.session['cart_count'] = 0
@@ -127,8 +129,8 @@ class AddOrderView(generic.View):
 
         valid = True
         for item in items:
-            quantity = Item.objects.filter(name=item.product.name).values_list('quantity', flat=True)[0]
-            if item.quantity >= quantity:
+            quantity = Item.objects.get(id=item.product.id)
+            if item.quantity >= quantity.quantity:
                 valid = False
 
         return valid
@@ -143,7 +145,7 @@ class PaymentView(generic.DetailView):
         context = super(PaymentView, self).get_context_data(**kwargs)
         context['stripe_key'] = settings.STRIPE_PUBLIC_KEY
         amount = Order.objects.filter(pk=self.kwargs['pk']).values_list('total_price', flat=True)[0]
-        context['stripe_amount'] = int(amount*100)
+        context['stripe_amount'] = int(amount * 100)
 
         return context
 
@@ -154,7 +156,6 @@ class CancelOrderView(generic.DeleteView):
     success_url = reverse_lazy('index')
 
     def delete(self, request, *args, **kwargs):
-
         request.session['order'] = False
         return super(CancelOrderView, self).delete(self, request, *args, **kwargs)
 
