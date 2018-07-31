@@ -12,7 +12,7 @@
         <th>Total Price</th>
         </thead>
         <tr>
-            <td>{{ order.pk }}</td>
+            <td>#{{ order.pk }}-{{ order.create_date }}-{{ order.total_price }}</td>
             <td>{{ order.total_price }}</td>
         </tr>
     </table>

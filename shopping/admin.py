@@ -11,6 +11,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(CancelOrderMixin, admin.ModelAdmin):
     list_display = ['id', 'total_price', 'total_items_count', 'status', 'create_date', 'metadata']
     inlines = [OrderItemInline]
+    list_filter = ['status']
 
     def has_delete_permission(self, request, obj=None):
         return False

@@ -105,7 +105,7 @@ class AddOrderView(generic.View):
         else:
             # Add message
             messages.error(request, 'Error!')
-            return redirect('index')
+            return redirect('show_cart')
 
     @staticmethod
     def valid(items):

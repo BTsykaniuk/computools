@@ -21,7 +21,7 @@ class Order(BaseModel):
     metadata = JSONField(null=False, blank=True)
 
     def __str__(self):
-        return f"Date - {self.create_date} Amount - {self.total_price}"
+        return f"Order #{self.pk}-{self.create_date}-{self.total_price}"
 
     class Meta:
         ordering = ['-create_date']

@@ -47,6 +47,7 @@ class CancelOrderMixin(object):
     def back_item(order_id):
         for order_item in OrderItem.objects.filter(order=order_id).select_related('item'):
             order_item.item.quantity = F('quantity') + order_item.quantity
+            order_item.item.active = True
             order_item.item.save()
 
 
