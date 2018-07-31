@@ -22,5 +22,3 @@ class OrderAdmin(CancelOrderMixin, admin.ModelAdmin):
             self.back_item(obj.pk)
 
         obj.save()
-
-
