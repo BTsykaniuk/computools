@@ -38,7 +38,10 @@ INSTALLED_APPS = [
 
     'products',
     'carton',
-    'shopping'
+    'shopping',
+    'rest_framework',
+    'products_api',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
