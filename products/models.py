@@ -28,7 +28,7 @@ class Product(BaseModel):
 
 class Item(BaseModel):
     name = models.CharField(max_length=50)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, default=None)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, default=None, related_name='items')
     active = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.DecimalField(max_digits=6, decimal_places=0, default=0)
