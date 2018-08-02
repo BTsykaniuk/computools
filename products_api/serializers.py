@@ -43,12 +43,12 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.save()
 
         # Update or create items
-        for items in items_data:
-            id = items.get('id', None)
+        for item in items_data:
+            item_id = item.get('id', None)
 
-            if id:
-                Item.objects.filter(id=id, product=instance.id).update(product=instance, **items)
+            if item_id:
+                Item.objects.filter(id=item_id, product=instance.id).update(product=instance, **item)
             else:
-                Item.objects.create(product=instance, **items)
+                Item.objects.create(product=instance, **item)
 
         return instance
