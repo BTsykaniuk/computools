@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from rest_framework import generics
 from rest_framework.parsers import MultiPartParser
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,13 +11,19 @@ from products_api.serializers import ProductSerializer
 class ProductsListView(generics.ListCreateAPIView):
     """CBV for all products"""
 
-    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     parser_classes = (MultiPartParser,)
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('active',)
 
-    # def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args, **kwargs):
+        queryset = Product.objects.all()
+        query = self.request.GET.get('q')
+
+        if query == 'items':
+            queryset = queryset.exclude(items__isnull=True)
+
+        return queryset
 
 
 class ProductChangeView(generics.RetrieveUpdateDestroyAPIView):
@@ -24,3 +32,4 @@ class ProductChangeView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     parser_classes = (MultiPartParser,)
+
