@@ -37,3 +37,9 @@ class Item(BaseModel):
     def __str__(self):
         return f'{self.name} item'
 
+    def save(self, *args, **kwargs):
+        if self.quantity == 0:
+            self.active = False
+
+        return super(Item, self).save(*args, **kwargs)
+
