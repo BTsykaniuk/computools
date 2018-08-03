@@ -20,6 +20,27 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id', 'name', 'description', 'active', 'image', 'items')
 
+    def validate(self, attrs):
+
+        errors_dict = {}
+
+        for item in attrs['items']:
+            if 'quantity' in item:
+                if item['quantity'] < 0:
+                    errors_dict['item.quantity'] = 'Item quantity must be positive'
+
+                if item['quantity'] == 0:
+                    item['active'] = False
+
+            if 'price' in item:
+                if item['price'] <= 0:
+                    errors_dict['item.price'] = 'Item price must be positive'
+
+        if errors_dict:
+            raise serializers.ValidationError(errors_dict)
+
+        return attrs
+
     def create(self, valid_data):
         """Save data to Item model"""
         items = valid_data.pop('items')
