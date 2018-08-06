@@ -15,10 +15,12 @@ class ItemSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     """DRF serializer for Product model"""
     items = ItemSerializer(many=True)
+    # active_items = serializers.SerializerMethodField(read_only=True)
+    active_items = serializers.Field(write_only=True, required=False)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'active', 'image', 'items')
+        fields = ('id', 'name', 'description', 'active', 'image', 'items', 'active_items')
 
     def validate(self, attrs):
 
@@ -41,16 +43,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    def create(self, valid_data):
-        """Save data to Item model"""
-        items = valid_data.pop('items')
-        product = Product.objects.create(**valid_data)
-
-        for item in items:
-            Item.objects.create(product=product, **item)
-
-        return product
-
     def update(self, instance, validated_data):
         """Full update Product and Items"""
         items_data = validated_data.pop('items')
@@ -63,15 +55,21 @@ class ProductSerializer(serializers.ModelSerializer):
 
         instance.save()
 
+        print(instance.active_items)
+
         # Update or create items
-        for item in items_data:
+        self.create_update_item(instance, items_data)
+
+        return instance
+
+    @staticmethod
+    def create_update_item(instance, items):
+        """Update Item if exist or create new object"""
+
+        for item in items:
             item_id = item.get('id', None)
 
             if item_id:
                 Item.objects.filter(id=item_id, product=instance.id).update(product=instance, **item)
             else:
                 Item.objects.create(product=instance, **item)
-
-        return instance
-
-    # def patch_item(self, instance, item_ids):

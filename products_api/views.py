@@ -27,7 +27,7 @@ class ProductsListView(generics.ListCreateAPIView):
         return queryset
 
 
-class ProductChangeView(generics.RetrieveUpdateDestroyAPIView):
+class ProductChangeView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     """CBV for read, write, delete and update single Product"""
 
     queryset = Product.objects.all()
@@ -35,3 +35,5 @@ class ProductChangeView(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (MultiPartParser,)
     permission_classes = (permissions.IsAdminUser, )
 
+    def put(self, request, *args, **kwargs):
+        print(request.POST)
