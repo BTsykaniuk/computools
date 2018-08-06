@@ -73,3 +73,5 @@ class ProductSerializer(serializers.ModelSerializer):
                 Item.objects.create(product=instance, **item)
 
         return instance
+
+    # def patch_item(self, instance, item_ids):

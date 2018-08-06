@@ -3,6 +3,7 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.parsers import MultiPartParser
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions
 
 from products.models import Product
 from products_api.serializers import ProductSerializer
@@ -32,4 +33,5 @@ class ProductChangeView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     parser_classes = (MultiPartParser,)
+    permission_classes = (permissions.IsAdminUser, )
 

@@ -18,6 +18,3 @@ class ItemAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'create_date', 'update_date', 'active']
-
-
-
