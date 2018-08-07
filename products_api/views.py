@@ -34,6 +34,3 @@ class ProductChangeView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAP
     serializer_class = ProductSerializer
     parser_classes = (MultiPartParser,)
     permission_classes = (permissions.IsAdminUser, )
-
-    def put(self, request, *args, **kwargs):
-        print(request.POST)
