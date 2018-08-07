@@ -23,7 +23,7 @@ class ProductsListView(generics.ListCreateAPIView):
         if query == 'items':
             queryset = queryset.exclude(items__isnull=True)
 
-        return queryset
+        return query
 
 
 class ProductChangeView(generics.RetrieveUpdateDestroyAPIView):
